@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/package.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ParcelTrack - Professional Delivery Services</title>
+    <meta
+      name="description"
+      content="Professional parcel delivery and tracking system"
+    />
+    <!-- Theme Script - Prevents Flash of Wrong Theme -->
+    <script>
+      (function() {
+        try {
+          const theme = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          
+          if (theme === 'dark' || (theme === 'system' && prefersDark)) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {
+          console.error('Theme initialization error:', e);
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-28d49d92.js"></script>
+    <link rel="stylesheet" href="/assets/index-223a49ca.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+  </body>
+</html>
