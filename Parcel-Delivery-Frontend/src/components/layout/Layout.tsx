@@ -1,4 +1,5 @@
 import ConditionalNavigation from "./Navigation/ConditionalNavigation";
+import ConditionalFooter from "./Footer/ConditionalFooter";
 import React from "react";
 
 interface LayoutProps {
@@ -7,9 +8,10 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <ConditionalNavigation />
-      <main>{children}</main>
+      <main className="flex-grow">{children}</main>
+      <ConditionalFooter />
     </div>
   );
 }

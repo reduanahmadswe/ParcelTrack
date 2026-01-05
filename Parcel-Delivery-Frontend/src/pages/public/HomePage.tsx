@@ -5,7 +5,6 @@ import {
   ContactSection,
   CTASection,
   CustomerSatisfactionSection,
-  FooterSection,
   HeroSection,
   KeyFeaturesSection,
   LiveTrackingSection,
@@ -21,9 +20,9 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     if (user) {
       const dashboardPath = user.role === "admin" ? "/admin/dashboard"
-                          : user.role === "sender" ? "/sender/dashboard"
-                          : user.role === "receiver" ? "/receiver/dashboard"
-                          : "/";
+        : user.role === "sender" ? "/sender/dashboard"
+          : user.role === "receiver" ? "/receiver/dashboard"
+            : "/";
       navigate(dashboardPath, { replace: true });
     }
   }, [user, navigate]);
@@ -43,7 +42,6 @@ const HomePage: React.FC = () => {
       <CTASection />
       <PartnersSection />
       <ContactSection />
-      <FooterSection />
     </main>
   );
 };

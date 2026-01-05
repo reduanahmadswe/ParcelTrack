@@ -22,7 +22,7 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        
+
         setLoading: (state, action: PayloadAction<boolean>) => {
             state.loading = action.payload;
         },
@@ -36,11 +36,14 @@ const authSlice = createSlice({
             state.isAuthenticated = true;
             state.loading = false;
 
+            // Save tokens to localStorage
+            TokenManager.setTokens(token, refreshToken);
+
             try {
                 if (typeof window !== 'undefined') {
                     console.debug('[authSlice] loginSuccess dispatched for user:', user?.email, 'role:', user?.role);
                 }
-            } catch (err) {}
+            } catch (err) { }
 
         },
 
@@ -60,7 +63,7 @@ const authSlice = createSlice({
 
         refreshTokenSuccess: (state, action: PayloadAction<string>) => {
             state.token = action.payload;
-            
+
             TokenManager.setTokens(action.payload, state.refreshToken || undefined);
         },
 
@@ -70,12 +73,12 @@ const authSlice = createSlice({
             state.refreshToken = null;
             state.isAuthenticated = false;
             state.loading = false;
-            
+
             try {
                 if (typeof window !== 'undefined') {
                     console.debug('[authSlice] logout reducer executed');
                 }
-            } catch (err) {}
+            } catch (err) { }
 
             TokenManager.clearTokens();
             if (typeof window !== 'undefined') {
@@ -86,20 +89,13 @@ const authSlice = createSlice({
         restoreAuth: (state, action: PayloadAction<{ user: User; token: string; refreshToken?: string }>) => {
             const { user, token, refreshToken } = action.payload;
 
-            const storedToken = TokenManager.getAccessToken();
-            if (storedToken && storedToken === token) {
-                state.user = user;
-                state.token = token;
-                state.refreshToken = refreshToken || null;
-                state.isAuthenticated = true;
-            } else {
-                
-                state.user = null;
-                state.token = null;
-                state.refreshToken = null;
-                state.isAuthenticated = false;
-                TokenManager.clearTokens();
-            }
+            // Always save tokens to localStorage when restoring auth
+            TokenManager.setTokens(token, refreshToken);
+
+            state.user = user;
+            state.token = token;
+            state.refreshToken = refreshToken || null;
+            state.isAuthenticated = true;
             state.loading = false;
         },
     },

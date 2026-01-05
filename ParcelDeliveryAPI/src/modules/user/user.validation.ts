@@ -31,6 +31,20 @@ export const updateUserValidation = z.object({
       zipCode: z.string().min(1, 'ZIP code is required').trim().optional(),
       country: z.string().min(1, 'Country is required').trim().optional(),
     }).optional(),
+    addressBook: z.array(z.object({
+      label: z.string().optional(),
+      street: z.string().optional(),
+      city: z.string().optional(),
+      state: z.string().optional(),
+      zipCode: z.string().optional(),
+      country: z.string().optional(),
+      isDefault: z.boolean().optional(),
+    })).optional(),
+    preferences: z.object({
+      deliveryTime: z.enum(['any', 'morning', 'afternoon', 'evening']).optional(),
+      notifications: z.boolean().optional(),
+      newsletter: z.boolean().optional(),
+    }).optional(),
   }),
 });
 

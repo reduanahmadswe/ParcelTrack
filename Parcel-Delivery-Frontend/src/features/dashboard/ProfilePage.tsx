@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import ProtectedRoute from "../../components/common/ProtectedRoute";
 import { useAuth } from "../../hooks/useAuth";
 import api from "../../services/ApiConfiguration";
-import FooterSection from "../../pages/public/sections/FooterSection";
+import { useGetCurrentUserQuery, useUpdateProfileMutation } from "../../store/api/authApi";
 
 interface UserProfile {
   name: string;
@@ -28,8 +28,10 @@ interface PasswordUpdateData {
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
+  const { data: userData, isLoading: isFetchingProfile, error: fetchError, refetch } = useGetCurrentUserQuery();
+  const [updateProfile] = useUpdateProfileMutation();
+
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -45,23 +47,12 @@ const ProfilePage: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
-    try {
-      setIsLoading(true);
-      const response = await api.get("/users/profile");
-      const profileData = response.data.data;
+    if (userData?.data) {
+      const profileData = userData.data;
       setProfile(profileData);
       setFormData(profileData);
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-      toast.error("Failed to load profile");
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [userData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -149,13 +140,13 @@ const ProfilePage: React.FC = () => {
 
     try {
       setIsUpdating(true);
-      const response = await api.put("/users/profile", formData);
-      setProfile(response.data.data);
+      await updateProfile(formData as any).unwrap();
+      await refetch();
       setIsEditing(false);
       toast.success("Profile updated successfully");
     } catch (error: any) {
       console.error("Error updating profile:", error);
-      toast.error(error.response?.data?.message || "Failed to update profile");
+      toast.error(error?.data?.message || "Failed to update profile");
     } finally {
       setIsUpdating(false);
     }
@@ -186,11 +177,34 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  if (isLoading) {
+  if (isFetchingProfile) {
     return (
       <ProtectedRoute>
         <div className="min-h-screen bg-background flex items-center justify-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
+              Failed to Load Profile
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              {(fetchError as any)?.data?.message || "Unable to load your profile information. Please try again."}
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
         </div>
       </ProtectedRoute>
     );
@@ -217,7 +231,7 @@ const ProfilePage: React.FC = () => {
     <ProtectedRoute>
       <div className="min-h-screen bg-background mt-8 sm:mt-10">
         <div className="max-w-4xl mx-auto pt-2 sm:pt-3 px-3 xs:px-4 sm:px-5 lg:px-6 space-y-4 sm:space-y-5 lg:space-y-6 pb-20 sm:pb-24">
-          {}
+          { }
           <div className="bg-gradient-to-r from-red-50/50 via-purple-50/30 to-pink-50/50 dark:from-red-950/20 dark:via-purple-950/10 dark:to-pink-950/20 border border-border rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-6 hover:shadow-xl hover:border-red-200 dark:hover:border-red-800 hover:bg-gradient-to-r hover:from-red-50/70 hover:via-purple-50/50 hover:to-pink-50/70 dark:hover:from-red-950/30 dark:hover:via-purple-950/20 dark:hover:to-pink-950/30 transition-all duration-300 backdrop-blur-sm">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
               <div className="space-y-2 sm:space-y-3">
@@ -247,7 +261,7 @@ const ProfilePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-            {}
+            { }
             <div className="lg:col-span-2">
               <div className="bg-gradient-to-br from-background via-red-50/10 to-purple-50/10 dark:from-background dark:via-red-950/5 dark:to-purple-950/5 rounded-lg sm:rounded-xl shadow-sm border border-border hover:shadow-xl hover:border-red-200 dark:hover:border-red-800 transition-all duration-300 backdrop-blur-sm">
                 <div className="p-4 sm:p-5 lg:p-6 border-b border-border">
@@ -279,11 +293,10 @@ const ProfilePage: React.FC = () => {
                             name="name"
                             value={formData?.name || ""}
                             onChange={handleInputChange}
-                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg text-xs xs:text-sm sm:text-base bg-background text-foreground focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 ${
-                              errors.name
-                                ? "border-red-500"
-                                : "border-border hover:border-red-300"
-                            }`}
+                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg text-xs xs:text-sm sm:text-base bg-background text-foreground focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 ${errors.name
+                              ? "border-red-500"
+                              : "border-border hover:border-red-300"
+                              }`}
                           />
                           {errors.name && (
                             <p className="text-red-500 text-xs xs:text-sm mt-1">
@@ -301,11 +314,10 @@ const ProfilePage: React.FC = () => {
                             name="email"
                             value={formData?.email || ""}
                             onChange={handleInputChange}
-                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg text-xs xs:text-sm sm:text-base bg-background text-foreground focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 ${
-                              errors.email
-                                ? "border-red-500"
-                                : "border-border hover:border-red-300"
-                            }`}
+                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg text-xs xs:text-sm sm:text-base bg-background text-foreground focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 ${errors.email
+                              ? "border-red-500"
+                              : "border-border hover:border-red-300"
+                              }`}
                           />
                           {errors.email && (
                             <p className="text-red-500 text-xs xs:text-sm mt-1">
@@ -323,11 +335,10 @@ const ProfilePage: React.FC = () => {
                             name="phone"
                             value={formData?.phone || ""}
                             onChange={handleInputChange}
-                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg text-xs xs:text-sm sm:text-base bg-background text-foreground focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 ${
-                              errors.phone
-                                ? "border-red-500"
-                                : "border-border hover:border-red-300"
-                            }`}
+                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg text-xs xs:text-sm sm:text-base bg-background text-foreground focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 ${errors.phone
+                              ? "border-red-500"
+                              : "border-border hover:border-red-300"
+                              }`}
                           />
                           {errors.phone && (
                             <p className="text-red-500 text-xs xs:text-sm mt-1">
@@ -352,7 +363,7 @@ const ProfilePage: React.FC = () => {
                         </div>
                       </div>
 
-                      {}
+                      { }
                       <div>
                         <h3 className="text-sm xs:text-base sm:text-lg font-medium text-foreground mb-3 sm:mb-4">
                           Address Information
@@ -496,7 +507,7 @@ const ProfilePage: React.FC = () => {
                         </div>
                       </div>
 
-                      {}
+                      { }
                       <div className="border-t border-border pt-4 sm:pt-5 lg:pt-6">
                         <h3 className="text-sm xs:text-base sm:text-lg font-medium text-foreground mb-3 sm:mb-4">
                           Address Information
@@ -525,9 +536,9 @@ const ProfilePage: React.FC = () => {
               </div>
             </div>
 
-            {}
+            { }
             <div className="space-y-4 sm:space-y-5 lg:space-y-6">
-              {}
+              { }
               <div className="bg-gradient-to-br from-background via-red-50/10 to-purple-50/10 dark:from-background dark:via-red-950/5 dark:to-purple-950/5 rounded-xl shadow-sm border border-border hover:shadow-xl hover:border-red-200 dark:hover:border-red-800 transition-all duration-300 backdrop-blur-sm">
                 <div className="p-3 xs:p-4 sm:p-5 lg:p-6 border-b border-border">
                   <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3 xs:gap-0">
@@ -558,11 +569,10 @@ const ProfilePage: React.FC = () => {
                             name="currentPassword"
                             value={passwordData.currentPassword}
                             onChange={handlePasswordChange}
-                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg bg-background text-foreground text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-red-500 focus:border-transparent pr-10 transition-all duration-300 ${
-                              errors.currentPassword
-                                ? "border-red-500"
-                                : "border-border hover:border-red-300"
-                            }`}
+                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg bg-background text-foreground text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-red-500 focus:border-transparent pr-10 transition-all duration-300 ${errors.currentPassword
+                              ? "border-red-500"
+                              : "border-border hover:border-red-300"
+                              }`}
                           />
                           <button
                             type="button"
@@ -595,11 +605,10 @@ const ProfilePage: React.FC = () => {
                             name="newPassword"
                             value={passwordData.newPassword}
                             onChange={handlePasswordChange}
-                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg bg-background text-foreground text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-red-500 focus:border-transparent pr-10 transition-all duration-300 ${
-                              errors.newPassword
-                                ? "border-red-500"
-                                : "border-border hover:border-red-300"
-                            }`}
+                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg bg-background text-foreground text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-red-500 focus:border-transparent pr-10 transition-all duration-300 ${errors.newPassword
+                              ? "border-red-500"
+                              : "border-border hover:border-red-300"
+                              }`}
                           />
                           <button
                             type="button"
@@ -630,11 +639,10 @@ const ProfilePage: React.FC = () => {
                             name="confirmPassword"
                             value={passwordData.confirmPassword}
                             onChange={handlePasswordChange}
-                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg bg-background text-foreground text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-red-500 focus:border-transparent pr-10 transition-all duration-300 ${
-                              errors.confirmPassword
-                                ? "border-red-500"
-                                : "border-border hover:border-red-300"
-                            }`}
+                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg bg-background text-foreground text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-red-500 focus:border-transparent pr-10 transition-all duration-300 ${errors.confirmPassword
+                              ? "border-red-500"
+                              : "border-border hover:border-red-300"
+                              }`}
                           />
                           <button
                             type="button"
@@ -693,7 +701,7 @@ const ProfilePage: React.FC = () => {
                 </div>
               </div>
 
-              {}
+              { }
               {user?.role === "sender" && (
                 <div className="bg-gradient-to-br from-background via-red-50/10 to-purple-50/10 dark:from-background dark:via-red-950/5 dark:to-purple-950/5 rounded-xl shadow-sm border border-border hover:shadow-xl hover:border-red-200 dark:hover:border-red-800 transition-all duration-300 backdrop-blur-sm">
                   <div className="p-3 xs:p-4 sm:p-5 lg:p-6">
@@ -726,7 +734,7 @@ const ProfilePage: React.FC = () => {
           </div>
         </div>
       </div>
-      <FooterSection />
+
     </ProtectedRoute>
   );
 };

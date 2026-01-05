@@ -5,6 +5,8 @@ import api from "../../services/ApiConfiguration";
 import { CheckCircle, Package, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useGetAllUsersQuery, useGetAllParcelsQuery } from "../../store/api/adminApi";
+import { useAuth } from "../../hooks/useAuth";
+import { TokenManager } from "../../services/TokenManager";
 
 import AdminHeader from "../../pages/admin/components/AdminHeader";
 import StatCards from "../../pages/admin/components/StatCards";
@@ -39,6 +41,8 @@ interface RecentParcel {
 }
 
 export default function AdminDashboard() {
+  const { user, loading: authLoading } = useAuth();
+  
   const [stats, setStats] = useState<DashboardStats>({ 
     users: { total: 0, active: 0, blocked: 0, newThisMonth: 0 }, 
     parcels: { 
@@ -58,21 +62,20 @@ export default function AdminDashboard() {
   const [recentParcels, setRecentParcels] = useState<RecentParcel[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const { data: usersData, refetch: refetchUsers, isLoading: usersLoading } = useGetAllUsersQuery(undefined, {
-    
+  // Only fetch data when user is authenticated and is admin
+  const shouldFetch = !authLoading && user?.role === "admin" && !!TokenManager.getAccessToken();
+
+  const { data: usersData, refetch: refetchUsers, isLoading: usersLoading, error: usersError } = useGetAllUsersQuery(undefined, {
+    skip: !shouldFetch, // Skip query until user is authenticated
     refetchOnFocus: false,
-    
     refetchOnMountOrArgChange: false,
-    
     refetchOnReconnect: true,
   });
   
-  const { data: parcelsData, refetch: refetchParcels, isLoading: parcelsLoading } = useGetAllParcelsQuery(undefined, {
-    
+  const { data: parcelsData, refetch: refetchParcels, isLoading: parcelsLoading, error: parcelsError } = useGetAllParcelsQuery(undefined, {
+    skip: !shouldFetch, // Skip query until user is authenticated
     refetchOnFocus: false,
-    
     refetchOnMountOrArgChange: false,
-    
     refetchOnReconnect: true,
   });
 
@@ -102,6 +105,16 @@ export default function AdminDashboard() {
       window.removeEventListener('cache-invalidated', handleCacheInvalidation);
     };
   }, [refetchParcels, refetchUsers]);
+
+  // Log errors for debugging
+  useEffect(() => {
+    if (usersError) {
+      console.error('❌ [AdminDashboard] Users API Error:', usersError);
+    }
+    if (parcelsError) {
+      console.error('❌ [AdminDashboard] Parcels API Error:', parcelsError);
+    }
+  }, [usersError, parcelsError]);
 
   useEffect(() => {
     

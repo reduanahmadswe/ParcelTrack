@@ -6,6 +6,7 @@ import apiSlice from './api/apiSlice';
 import authSlice, { logout } from './slices/authSlice';
 import receiverSlice from './slices/receiverSlice';
 
+
 const createNoopStorage = () => {
     return {
         getItem() {
@@ -31,12 +32,12 @@ const authPersistConfig = {
 const apiPersistConfig = {
     key: 'api',
     storage: storageToUse,
-    
+
     whitelist: ['queries'],
     version: 1,
-    
+
     throttle: 1000,
-    
+
     debug: !IS_PROD,
 };
 
@@ -62,9 +63,9 @@ if (!IS_PROD && typeof window !== 'undefined') {
 }
 
 const logoutCacheResetMiddleware: Middleware = (storeAPI) => (next) => (action) => {
-    
+
     if (typeof action === 'object' && action !== null && 'type' in action && action.type === logout.type) {
-        
+
         storeAPI.dispatch(apiSlice.util.resetApiState());
 
         if (typeof window !== 'undefined') {
@@ -98,14 +99,14 @@ export const store = configureStore({
                 ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
             },
         })
-        .concat(apiSlice.middleware)
-        .concat(logoutCacheResetMiddleware),
-    
+            .concat(apiSlice.middleware)
+            .concat(logoutCacheResetMiddleware),
+
     devTools: !IS_PROD,
 });
 
 export const persistor = persistStore(store, null, () => {
-    
+
     if (!IS_PROD && typeof window !== 'undefined') {
         console.log('✅ [Redux Persist] Rehydration complete!');
         console.log('📦 [Redux Persist] Auth state:', localStorage.getItem('persist:auth') ? 'exists' : 'missing');

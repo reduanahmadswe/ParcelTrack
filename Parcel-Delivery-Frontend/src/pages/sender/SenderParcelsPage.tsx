@@ -20,7 +20,6 @@ import { useAuth } from "../../hooks/useAuth";
 import { useGetSenderParcelsQuery, useCancelParcelMutation } from "../../store/api/senderApi";
 import { formatDate, getStatusColor } from "../../utils/HelperUtilities";
 import { Parcel } from "../../types/GlobalTypeDefinitions";
-import FooterSection from "../public/sections/FooterSection";
 import ParcelDetailsModal from "../../components/modals/ParcelDetailsModal";
 import { invalidateRelatedCaches } from "../../utils/adminCache";
 
@@ -101,7 +100,7 @@ export default function SenderParcelsPage() {
   }, [currentPage]);
 
   useEffect(() => {
-    
+
     pollingIntervalRef.current = setInterval(() => {
       refetchParcels();
     }, 30000);
@@ -138,7 +137,7 @@ export default function SenderParcelsPage() {
       try {
         setRecentSearches(JSON.parse(saved));
       } catch (error) {
-        
+
       }
     }
   }, []);
@@ -146,7 +145,7 @@ export default function SenderParcelsPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 300); 
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
@@ -155,7 +154,7 @@ export default function SenderParcelsPage() {
     if (currentPage === 1) {
       refetchParcels();
     } else {
-      setCurrentPage(1); 
+      setCurrentPage(1);
     }
   }, [filterStatus, debouncedSearchTerm]);
 
@@ -227,8 +226,8 @@ export default function SenderParcelsPage() {
     if (!parcelToCancel) return;
 
     try {
-  setIsCancelling(true);
-  await cancelParcel({ id: parcelToCancel._id, reason: cancelReason }).unwrap();
+      setIsCancelling(true);
+      await cancelParcel({ id: parcelToCancel._id, reason: cancelReason }).unwrap();
       toast.success("Parcel cancelled successfully");
       setIsCancelDialogOpen(false);
       setParcelToCancel(null);
@@ -264,7 +263,7 @@ export default function SenderParcelsPage() {
     const newRecentSearches = [
       term,
       ...recentSearches.filter((search) => search !== term),
-    ].slice(0, 5); 
+    ].slice(0, 5);
 
     setRecentSearches(newRecentSearches);
     localStorage.setItem(
@@ -316,7 +315,7 @@ export default function SenderParcelsPage() {
         parcel.receiverInfo?.address?.city,
         parcel.currentStatus,
         parcel.parcelDetails?.type,
-      ].filter(Boolean); 
+      ].filter(Boolean);
 
       suggestions.forEach((suggestion) => {
         if (
@@ -384,7 +383,7 @@ export default function SenderParcelsPage() {
     <ProtectedRoute allowedRoles={["sender"]}>
       <div className="min-h-screen bg-background mt-10">
         <div className="max-w-7xl mx-auto pt-2 px-3 sm:px-4 lg:px-6 space-y-3 sm:space-y-4 lg:space-y-6 pb-24">
-          {}
+          { }
           <div className="bg-gradient-to-r from-blue-50/50 via-transparent to-green-50/50 dark:from-blue-950/20 dark:to-green-950/20 border border-border rounded-xl p-3 sm:p-4 lg:p-6">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
               <div>
@@ -398,7 +397,7 @@ export default function SenderParcelsPage() {
             </div>
           </div>
 
-          {}
+          { }
           <div className="bg-background rounded-lg shadow-sm border border-border p-3 sm:p-4 lg:p-6">
             <div className="flex flex-col md:flex-row gap-3 sm:gap-4">
               <div className="flex-1">
@@ -418,13 +417,13 @@ export default function SenderParcelsPage() {
                     onKeyDown={handleSearchSubmit}
                     className="w-full pl-8 sm:pl-10 pr-8 sm:pr-10 py-1.5 sm:py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-background text-foreground placeholder:text-muted-foreground text-xs sm:text-sm"
                   />
-                  {}
+                  { }
                   {searchTerm !== debouncedSearchTerm && (
                     <div className="absolute right-7 sm:right-8 top-1/2 transform -translate-y-1/2">
                       <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-blue-600"></div>
                     </div>
                   )}
-                  {}
+                  { }
                   {searchTerm && (
                     <button
                       onClick={() => {
@@ -438,7 +437,7 @@ export default function SenderParcelsPage() {
                     </button>
                   )}
 
-                  {}
+                  { }
                   {showSearchSuggestions && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
                       {getSearchSuggestions().length > 0 ? (
@@ -504,7 +503,7 @@ export default function SenderParcelsPage() {
             </div>
           </div>
 
-          {}
+          { }
           <div className="bg-background rounded-lg shadow-sm border border-border">
             <div className="p-3 sm:p-4 lg:p-6 border-b border-border">
               <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 xs:gap-3">
@@ -556,7 +555,7 @@ export default function SenderParcelsPage() {
                 </div>
               ) : (
                 <>
-                  {}
+                  { }
                   {loading && (
                     <div className="px-3 sm:px-6 py-2 border-b border-border">
                       <div className="flex items-center space-x-2 text-xs sm:text-sm text-muted-foreground">
@@ -566,7 +565,7 @@ export default function SenderParcelsPage() {
                     </div>
                   )}
 
-                  {}
+                  { }
                   <table
                     className="w-full hidden md:table"
                     style={{
@@ -662,7 +661,7 @@ export default function SenderParcelsPage() {
                                 to={`/status-history?id=${parcel.trackingId}`}
                                 className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition-colors duration-200"
                                 title="View status history"
-                                onClick={() => {}}
+                                onClick={() => { }}
                               >
                                 <Calendar className="h-3 w-3 lg:h-4 lg:w-4" />
                               </Link>
@@ -682,7 +681,7 @@ export default function SenderParcelsPage() {
                     </tbody>
                   </table>
 
-                  {}
+                  { }
                   <div className="md:hidden divide-y divide-border"
                     style={{
                       opacity: loading ? 0.6 : 1,
@@ -728,7 +727,7 @@ export default function SenderParcelsPage() {
                               to={`/status-history?id=${parcel.trackingId}`}
                               className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition-colors duration-200 p-1.5 rounded hover:bg-green-50 dark:hover:bg-green-900/20"
                               title="View status history"
-                              onClick={() => {}}
+                              onClick={() => { }}
                             >
                               <Calendar className="h-4 w-4" />
                             </Link>
@@ -782,7 +781,7 @@ export default function SenderParcelsPage() {
               )}
             </div>
 
-            {}
+            { }
             {displayParcels.length > 0 && pagination.totalPages > 1 && (
               <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-border">
                 <div className="flex flex-col xs:flex-row items-center justify-between gap-3">
@@ -799,23 +798,22 @@ export default function SenderParcelsPage() {
                   </div>
 
                   <div className="flex items-center space-x-1.5 sm:space-x-2 order-1 xs:order-2">
-                    {}
+                    { }
                     <button
                       onClick={handlePrevPage}
                       disabled={!pagination.hasPrevPage || loading}
-                      className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 flex items-center space-x-1 ${
-                        pagination.hasPrevPage && !loading
-                          ? "bg-muted hover:bg-muted/80 text-foreground"
-                          : "bg-muted/50 text-muted-foreground cursor-not-allowed"
-                      }`}
+                      className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 flex items-center space-x-1 ${pagination.hasPrevPage && !loading
+                        ? "bg-muted hover:bg-muted/80 text-foreground"
+                        : "bg-muted/50 text-muted-foreground cursor-not-allowed"
+                        }`}
                     >
                       <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
                       <span className="hidden xs:inline">Previous</span>
                     </button>
 
-                    {}
+                    { }
                     <div className="flex items-center space-x-1">
-                      {}
+                      { }
                       {currentPage > 3 && (
                         <>
                           <button
@@ -832,7 +830,7 @@ export default function SenderParcelsPage() {
                         </>
                       )}
 
-                      {}
+                      { }
                       {Array.from(
                         { length: pagination.totalPages },
                         (_, i) => i + 1
@@ -841,26 +839,24 @@ export default function SenderParcelsPage() {
                           (page) =>
                             page >= Math.max(1, currentPage - 2) &&
                             page <=
-                              Math.min(pagination.totalPages, currentPage + 2)
+                            Math.min(pagination.totalPages, currentPage + 2)
                         )
                         .map((page) => (
                           <button
                             key={page}
                             onClick={() => handlePageChange(page)}
                             disabled={loading}
-                            className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 ${
-                              page === currentPage
-                                ? "bg-red-600 text-white"
-                                : "bg-muted hover:bg-muted/80 text-foreground"
-                            } ${
-                              loading ? "cursor-not-allowed opacity-50" : ""
-                            }`}
+                            className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 ${page === currentPage
+                              ? "bg-red-600 text-white"
+                              : "bg-muted hover:bg-muted/80 text-foreground"
+                              } ${loading ? "cursor-not-allowed opacity-50" : ""
+                              }`}
                           >
                             {page}
                           </button>
                         ))}
 
-                      {}
+                      { }
                       {currentPage < pagination.totalPages - 2 && (
                         <>
                           {currentPage < pagination.totalPages - 3 && (
@@ -880,15 +876,14 @@ export default function SenderParcelsPage() {
                       )}
                     </div>
 
-                    {}
+                    { }
                     <button
                       onClick={handleNextPage}
                       disabled={!pagination.hasNextPage || loading}
-                      className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 flex items-center space-x-1 ${
-                        pagination.hasNextPage && !loading
-                          ? "bg-muted hover:bg-muted/80 text-foreground"
-                          : "bg-muted/50 text-muted-foreground cursor-not-allowed"
-                      }`}
+                      className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 flex items-center space-x-1 ${pagination.hasNextPage && !loading
+                        ? "bg-muted hover:bg-muted/80 text-foreground"
+                        : "bg-muted/50 text-muted-foreground cursor-not-allowed"
+                        }`}
                     >
                       <span className="hidden xs:inline">Next</span>
                       <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -900,16 +895,15 @@ export default function SenderParcelsPage() {
           </div>
         </div>
       </div>
-      <FooterSection />
 
-      {}
+      { }
       <ParcelDetailsModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         parcel={selectedParcel}
       />
 
-      {}
+      { }
       {isCancelDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-background rounded-lg shadow-xl max-w-md w-full p-6">
@@ -919,7 +913,7 @@ export default function SenderParcelsPage() {
             <p className="text-sm text-muted-foreground mb-4">
               Are you sure you want to cancel this parcel? This action cannot be undone.
             </p>
-            
+
             {parcelToCancel && (
               <div className="bg-muted/30 rounded-lg p-3 mb-4">
                 <p className="text-xs text-muted-foreground mb-1">Tracking ID</p>

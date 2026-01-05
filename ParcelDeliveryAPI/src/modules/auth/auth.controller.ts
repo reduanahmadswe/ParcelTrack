@@ -4,6 +4,7 @@ import { clearAuthCookies, setAuthCookie } from '../../utils/authTokens';
 import { catchAsync } from '../../utils/catchAsync';
 import { sendResponse } from '../../utils/sendResponse';
 import { AuthService } from './auth.service';
+import { createUserTokens } from '../../utils/helpers';
 
 export class AuthController {
   // Register new user
@@ -100,5 +101,37 @@ export class AuthController {
         user: (req as any).user,
       },
     });
+  });
+
+  // Google OAuth callback
+  static googleCallback = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as any;
+    
+    if (!user) {
+      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=auth_failed`);
+    }
+
+    // Generate tokens
+    const tokens = createUserTokens({
+      _id: user._id.toString(),
+      email: user.email,
+      role: user.role,
+    });
+
+    // Set tokens in cookies
+    setAuthCookie(res, {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    });
+
+    // Redirect to frontend with tokens and user data
+    const userStr = encodeURIComponent(JSON.stringify({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    }));
+    const redirectUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/google/success?token=${tokens.accessToken}&refreshToken=${tokens.refreshToken}&user=${userStr}`;
+    res.redirect(redirectUrl);
   });
 }

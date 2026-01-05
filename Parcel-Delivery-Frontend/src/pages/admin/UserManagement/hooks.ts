@@ -1,10 +1,9 @@
-
-
 import api from "../../../services/ApiConfiguration";
 import { AxiosError } from "axios";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { ApiUser, User, UserForm, UserStats, UserUpdateForm } from "./types";
 import { adminCache, CACHE_KEYS, invalidateRelatedCaches } from "../../../utils/adminCache";
+import toast from "react-hot-toast";
 
 export function useUserManagement() {
     const [users, setUsers] = useState<User[]>([]);
@@ -48,6 +47,17 @@ export function useUserManagement() {
         try {
             fetchingRef.current = true;
 
+            // Check if token exists before making API call
+            const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+            if (!token) {
+                console.error('❌ [UserManagement] No token available, skipping fetch');
+                toast.error('Please login again - session expired');
+                setUsers([]);
+                setLoading(false);
+                fetchingRef.current = false;
+                return;
+            }
+
             if (!force) {
                 const cachedUsers = adminCache.get<User[]>(CACHE_KEYS.USERS);
                 if (cachedUsers) {
@@ -60,7 +70,10 @@ export function useUserManagement() {
 
             setLoading(true);
 
+            console.log('🔍 [UserManagement] Fetching users from API...');
+            console.log('🔑 [UserManagement] Token available:', token.substring(0, 20) + '...');
             const response = await api.get("/users");
+            console.log('✅ [UserManagement] Users API response:', response.data);
 
             const apiUsers = Array.isArray(response.data) 
                 ? response.data 
@@ -73,7 +86,24 @@ export function useUserManagement() {
             adminCache.set(CACHE_KEYS.USERS, transformedUsers);
 
             setUsers(transformedUsers);
+            console.log(`✅ [UserManagement] Loaded ${transformedUsers.length} users`);
         } catch (error) {
+            console.error('❌ [UserManagement] Error fetching users:', error);
+            
+            // Show error toast to user
+            if ((error as any)?.response?.status === 401) {
+                toast.error('Unauthorized! Please login again.');
+                console.error('❌ 401 Unauthorized - Token missing or invalid');
+            } else if ((error as any)?.response?.status === 403) {
+                toast.error('Access forbidden! Admin permission required.');
+            } else {
+                toast.error('Failed to load users. Check console for details.');
+            }
+            
+            if (error instanceof Error) {
+                console.error('Error message:', error.message);
+            }
+            console.error('Full error:', error);
             setUsers([]);
         } finally {
             setLoading(false);
@@ -84,7 +114,13 @@ export function useUserManagement() {
     useEffect(() => {
         if (!isMountedRef.current) {
             isMountedRef.current = true;
-            fetchUsers(false); 
+            
+            // Wait a bit for auth/tokens to be ready before fetching
+            const timer = setTimeout(() => {
+                fetchUsers(false);
+            }, 500); // 500ms delay to ensure tokens are set
+            
+            return () => clearTimeout(timer);
         }
     }, [fetchUsers]);
 

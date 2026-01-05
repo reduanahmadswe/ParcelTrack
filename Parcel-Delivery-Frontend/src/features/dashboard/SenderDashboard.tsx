@@ -8,7 +8,7 @@ import ProtectedRoute from "../../components/common/ProtectedRoute";
 import { useAuth } from "../../hooks/useAuth";
 import { getStatusColor } from "../../utils/HelperUtilities";
 import { Parcel } from "../../types/GlobalTypeDefinitions";
-import FooterSection from "../../pages/public/sections/FooterSection";
+
 import ParcelDetailsModal from "../../components/modals/ParcelDetailsModal";
 import { useGetSenderParcelsQuery } from "../../store/api/senderApi";
 import SenderParcelPieChart from "../../pages/sender/components/SenderParcelPieChart";
@@ -26,17 +26,17 @@ export default function SenderDashboard() {
   const [selectedParcel, setSelectedParcel] = useState<Parcel | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { 
-    data: parcels = [], 
-    isLoading, 
+  const {
+    data: parcels = [],
+    isLoading,
     isFetching,
-    refetch 
+    refetch
   } = useGetSenderParcelsQuery(undefined, {
-    
+
     refetchOnFocus: false,
-    
+
     refetchOnMountOrArgChange: false,
-    
+
     refetchOnReconnect: true,
   });
 
@@ -76,7 +76,7 @@ export default function SenderDashboard() {
     <ProtectedRoute allowedRoles={["sender"]}>
       <div className="min-h-screen bg-background mt-8 sm:mt-10">
         <div className="max-w-7xl mx-auto pt-2 sm:pt-3 px-3 xs:px-4 sm:px-5 lg:px-6 xl:px-8 space-y-4 sm:space-y-5 lg:space-y-6 pb-20 sm:pb-24">
-          {}
+          { }
           <div className="bg-gradient-to-r from-blue-50/50 via-transparent to-green-50/50 dark:from-blue-950/20 dark:to-green-950/20 border border-border rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-6 xl:p-8 hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50/70 hover:to-green-50/70 dark:hover:from-blue-950/30 dark:hover:to-green-950/30">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
               <div className="space-y-1 sm:space-y-2">
@@ -99,9 +99,9 @@ export default function SenderDashboard() {
             </div>
           </div>
 
-          {}
+          { }
           <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-3 xs:gap-4 sm:gap-5 lg:gap-6">
-            {}
+            { }
             <div className="bg-background rounded-lg sm:rounded-xl shadow-sm border border-border p-4 sm:p-5 lg:p-6 hover:shadow-xl hover:border-blue-300 dark:hover:border-blue-700 hover:scale-[1.03] transition-all duration-300 cursor-pointer group">
               <div className="flex items-center gap-3 sm:gap-4">
                 <div className="p-2 sm:p-2.5 lg:p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg sm:rounded-xl group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-colors duration-300 flex-shrink-0">
@@ -121,7 +121,7 @@ export default function SenderDashboard() {
               </div>
             </div>
 
-            {}
+            { }
             <div className="bg-background rounded-lg sm:rounded-xl shadow-sm border border-border p-4 sm:p-5 lg:p-6 hover:shadow-xl hover:border-yellow-300 dark:hover:border-yellow-700 hover:scale-[1.03] transition-all duration-300 cursor-pointer group">
               <div className="flex items-center gap-3 sm:gap-4">
                 <div className="p-2 sm:p-2.5 lg:p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg sm:rounded-xl group-hover:bg-yellow-100 dark:group-hover:bg-yellow-900/30 transition-colors duration-300 flex-shrink-0">
@@ -141,7 +141,7 @@ export default function SenderDashboard() {
               </div>
             </div>
 
-            {}
+            { }
             <div className="bg-background rounded-lg sm:rounded-xl shadow-sm border border-border p-4 sm:p-5 lg:p-6 hover:shadow-xl hover:border-purple-300 dark:hover:border-purple-700 hover:scale-[1.03] transition-all duration-300 cursor-pointer group">
               <div className="flex items-center gap-3 sm:gap-4">
                 <div className="p-2 sm:p-2.5 lg:p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg sm:rounded-xl group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 transition-colors duration-300 flex-shrink-0">
@@ -161,7 +161,7 @@ export default function SenderDashboard() {
               </div>
             </div>
 
-            {}
+            { }
             <div className="bg-background rounded-lg sm:rounded-xl shadow-sm border border-border p-4 sm:p-5 lg:p-6 hover:shadow-xl hover:border-green-300 dark:hover:border-green-700 hover:scale-[1.03] transition-all duration-300 cursor-pointer group">
               <div className="flex items-center gap-3 sm:gap-4">
                 <div className="p-2 sm:p-2.5 lg:p-3 bg-green-50 dark:bg-green-950/20 rounded-lg sm:rounded-xl group-hover:bg-green-100 dark:group-hover:bg-green-900/30 transition-colors duration-300 flex-shrink-0">
@@ -181,7 +181,7 @@ export default function SenderDashboard() {
               </div>
             </div>
 
-            {}
+            { }
             <div className="bg-background rounded-lg sm:rounded-xl shadow-sm border border-border p-4 sm:p-5 lg:p-6 hover:shadow-xl hover:border-red-300 dark:hover:border-red-700 hover:scale-[1.03] transition-all duration-300 cursor-pointer group">
               <div className="flex items-center gap-3 sm:gap-4">
                 <div className="p-2 sm:p-2.5 lg:p-3 bg-red-50 dark:bg-red-950/20 rounded-lg sm:rounded-xl group-hover:bg-red-100 dark:group-hover:bg-red-900/30 transition-colors duration-300 flex-shrink-0">
@@ -201,11 +201,11 @@ export default function SenderDashboard() {
               </div>
             </div>
           </div>
-          
+
           {/* Pie Chart Section */}
           <SenderParcelPieChart parcels={parcels} />
 
-          {}
+          { }
           <div className="bg-background rounded-lg sm:rounded-xl lg:rounded-2xl shadow-sm border border-border p-4 sm:p-5 lg:p-6 xl:p-8 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300">
             <h2 className="text-base xs:text-lg sm:text-xl lg:text-2xl font-semibold text-foreground mb-4 sm:mb-5 lg:mb-6">
               Quick Actions
@@ -270,7 +270,7 @@ export default function SenderDashboard() {
             </div>
           </div>
 
-          {}
+          { }
           <div className="bg-background rounded-lg sm:rounded-xl lg:rounded-2xl shadow-sm border border-border hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300">
             <div className="p-4 sm:p-5 lg:p-6 xl:p-8 border-b border-border">
               <div className="flex items-center justify-between gap-3 sm:gap-4">
@@ -347,9 +347,9 @@ export default function SenderDashboard() {
           </div>
         </div>
       </div>
-      <FooterSection />
 
-      {}
+
+      { }
       <ParcelDetailsModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

@@ -14,14 +14,27 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = TokenManager.getAccessToken();
+    const fromLocalStorage = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    
+    console.log('🔍 [API Request] URL:', config.baseURL + config.url);
+    console.log('🔑 [API Request] Token from TokenManager:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+    console.log('🔑 [API Request] Token from localStorage:', fromLocalStorage ? `${fromLocalStorage.substring(0, 20)}...` : 'NO TOKEN');
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('✅ [API Request] Authorization header set:', config.headers.Authorization?.substring(0, 30) + '...');
+    } else if (fromLocalStorage) {
+      // Fallback to localStorage if TokenManager fails
+      config.headers.Authorization = `Bearer ${fromLocalStorage}`;
+      console.log('✅ [API Request] Authorization header set from localStorage fallback');
+    } else {
+      console.error('⚠️ [API Request] NO TOKEN AVAILABLE - Request will likely fail with 401!');
     }
     
     return config;
   },
   (error) => {
+    console.error('❌ [API Request] Error:', error);
     return Promise.reject(error);
   }
 );

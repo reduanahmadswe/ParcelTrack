@@ -1,6 +1,4 @@
 
-export { default as ReceiverDashboard } from "./ReceiverDashboard";
-
 export { default as ParcelDetailsModal } from "./components/ParcelDetailsModal";
 export { default as ParcelList } from "./components/ParcelList";
 export { default as RatingStars } from "./components/RatingStars";

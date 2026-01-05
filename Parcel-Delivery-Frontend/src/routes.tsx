@@ -21,13 +21,13 @@ import CookiePolicyPage from "./pages/public/CookiePolicyPage";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import DebugAuthPage from "./pages/auth/DebugAuthPage";
+import GoogleAuthCallback from "./pages/auth/GoogleAuthCallback";
 
 import AdminDashboard from "./features/dashboard/AdminDashboard";
 import SenderDashboard from "./features/dashboard/SenderDashboard";
 import ReceiverDashboard from "./features/dashboard/ReceiverDashboard";
 import ProfilePage from "./features/dashboard/ProfilePage";
 
-import NotificationsPage from "./pages/admin/NotificationsPage";
 import ParcelManagementPage from "./pages/admin/ParcelManagement";
 import SystemSettingsPage from "./pages/admin/SystemSettings";
 import UserManagementPage from "./pages/admin/UserManagement";
@@ -41,8 +41,17 @@ import UnauthorizedPage from "./pages/error/UnauthorizedPage";
 
 import APITestPage from "./pages/APITestPage";
 
+// New Pages Imports
+import ReportsPage from "./pages/admin/ReportsPage";
+import SupportTicketsPage from "./pages/admin/SupportTicketsPage";
+import AddressBookPage from "./pages/sender/AddressBookPage";
+import BillingPage from "./pages/sender/BillingPage";
+import OrderHistoryPage from "./pages/receiver/OrderHistoryPage";
+import SavedAddressesPage from "./pages/receiver/SavedAddressesPage";
+import DeliveryPreferencesPage from "./pages/receiver/DeliveryPreferencesPage";
+
 export const routes: RouteConfig[] = [
-  
+
   {
     path: "/status-history",
     element: <StatusHistoryPage />,
@@ -88,6 +97,11 @@ export const routes: RouteConfig[] = [
     path: "/register",
     element: <RegisterPage />,
     layout: true,
+  },
+  {
+    path: "/auth/google/success",
+    element: <GoogleAuthCallback />,
+    layout: false,
   },
   {
     path: "/debug-auth",
@@ -152,6 +166,7 @@ export const routes: RouteConfig[] = [
     layout: true,
   },
 
+  // Admin Routes
   {
     path: "/admin/parcels",
     element: <ParcelManagementPage />,
@@ -167,20 +182,28 @@ export const routes: RouteConfig[] = [
     layout: true,
   },
   {
-    path: "/admin/notifications",
-    element: <NotificationsPage />,
-    protected: true,
-    allowedRoles: ["admin"],
-    layout: true,
-  },
-  {
     path: "/admin/settings",
     element: <SystemSettingsPage />,
     protected: true,
     allowedRoles: ["admin"],
     layout: true,
   },
+  {
+    path: "/admin/reports",
+    element: <ReportsPage />,
+    protected: true,
+    allowedRoles: ["admin"],
+    layout: true,
+  },
+  {
+    path: "/admin/support",
+    element: <SupportTicketsPage />,
+    protected: true,
+    allowedRoles: ["admin"],
+    layout: true,
+  },
 
+  // Sender Routes
   {
     path: "/sender/create-parcel",
     element: <CreateParcelPage />,
@@ -202,7 +225,22 @@ export const routes: RouteConfig[] = [
     allowedRoles: ["sender"],
     layout: true,
   },
+  {
+    path: "/sender/addresses",
+    element: <AddressBookPage />,
+    protected: true,
+    allowedRoles: ["sender"],
+    layout: true,
+  },
+  {
+    path: "/sender/billing",
+    element: <BillingPage />,
+    protected: true,
+    allowedRoles: ["sender"],
+    layout: true,
+  },
 
+  // Receiver Routes
   {
     path: "/receiver/track",
     element: <TrackPage />,
@@ -210,7 +248,7 @@ export const routes: RouteConfig[] = [
     allowedRoles: ["receiver"],
     layout: true,
   },
-  
+
   {
     path: "/receiver/profile",
     element: <ProfilePage />,
@@ -220,7 +258,21 @@ export const routes: RouteConfig[] = [
   },
   {
     path: "/receiver/history",
-    element: <ReceiverDashboard />,
+    element: <OrderHistoryPage />, // Updated to use dedicated page
+    protected: true,
+    allowedRoles: ["receiver"],
+    layout: true,
+  },
+  {
+    path: "/receiver/addresses",
+    element: <SavedAddressesPage />,
+    protected: true,
+    allowedRoles: ["receiver"],
+    layout: true,
+  },
+  {
+    path: "/receiver/preferences",
+    element: <DeliveryPreferencesPage />,
     protected: true,
     allowedRoles: ["receiver"],
     layout: true,
@@ -245,7 +297,7 @@ export const routes: RouteConfig[] = [
 ];
 
 export const shouldIncludeRoute = (path: string): boolean => {
-  
+
   if (process.env.NODE_ENV === 'production' && path === '/api-test') {
     return false;
   }

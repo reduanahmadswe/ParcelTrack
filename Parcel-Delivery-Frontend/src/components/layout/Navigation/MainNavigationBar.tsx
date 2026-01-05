@@ -31,12 +31,12 @@ interface NavigationItem {
 }
 
 export default function Navigation() {
-  
+
   const userFromStore = useAppSelector(selectCurrentUser);
   const { logout } = useAuth();
 
   const [user, setUser] = useState<typeof userFromStore>(() => {
-    
+
     if (userFromStore) return userFromStore;
     try {
       const cachedUser = localStorage.getItem('userData');
@@ -50,17 +50,17 @@ export default function Navigation() {
     if (userFromStore) {
       setUser(userFromStore);
     } else if (!userFromStore) {
-      
+
       console.warn("⚠️ [Navigation] Redux user is null, checking localStorage");
       try {
         const cachedUser = localStorage.getItem('userData');
         const hasToken = localStorage.getItem('accessToken');
-        
+
         if (cachedUser && hasToken) {
           const parsed = JSON.parse(cachedUser);
           setUser(parsed);
         } else if (!hasToken) {
-          
+
           setUser(null);
         }
       } catch (error) {
@@ -76,7 +76,7 @@ export default function Navigation() {
         setUser(userData);
       }
     };
-    
+
     window.addEventListener('userLoggedIn', handleUserLogin as EventListener);
     return () => {
       window.removeEventListener('userLoggedIn', handleUserLogin as EventListener);
@@ -93,21 +93,21 @@ export default function Navigation() {
             setUser(parsed);
           }
         } catch (error) {
-          
+
         }
       }, 500);
-      
+
       return () => clearInterval(interval);
     }
   }, [user]);
-  
+
   const location = useLocation();
   const navigate = useNavigate();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [notifications] = useState(3); 
+  const [notifications] = useState(3);
   const [currentHash, setCurrentHash] = useState(window.location.hash);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
@@ -116,7 +116,7 @@ export default function Navigation() {
     const handleHashChange = () => {
       setCurrentHash(window.location.hash);
     };
-    
+
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
@@ -177,7 +177,7 @@ export default function Navigation() {
   };
 
   const isActive = (href: string) => {
-    
+
     if (href.startsWith("#")) {
       const isOnHomePage = location.pathname === "/";
       const currentHash = window.location.hash || location.hash;
@@ -204,11 +204,11 @@ export default function Navigation() {
       await logout();
       setIsUserMenuOpen(false);
       setIsMobileMenuOpen(false);
-      
+
       navigate("/");
     } catch (error) {
       console.error("Logout error:", error);
-      
+
       navigate("/");
     }
   };
@@ -237,37 +237,37 @@ export default function Navigation() {
 
   const handleNavClick = (href: string) => {
     if (href.startsWith("#")) {
-      
+
       if (location.pathname !== "/") {
         navigate("/");
-        
+
         setTimeout(() => {
           const element = document.getElementById(href.slice(1));
           if (element) {
             element.scrollIntoView({ behavior: "smooth", block: "start" });
           }
-          
+
           window.location.hash = href;
           setCurrentHash(href);
         }, 100);
       } else {
-        
+
         const element = document.getElementById(href.slice(1));
         if (element) {
           element.scrollIntoView({ behavior: "smooth", block: "start" });
         }
-        
+
         window.location.hash = href;
         setCurrentHash(href);
       }
     }
-    
+
     setIsMobileMenuOpen(false);
     setIsUserMenuOpen(false);
   };
 
   const handleLinkClick = () => {
-    
+
     setIsMobileMenuOpen(false);
     setIsUserMenuOpen(false);
   };
@@ -275,13 +275,14 @@ export default function Navigation() {
   const navigationItems: NavigationItem[] =
     user?.role === "admin"
       ? [
-          { href: "/admin/dashboard", label: "Dashboard", icon: BarChart3 },
-          { href: "/admin/users", label: "Users", icon: Users },
-          { href: "/admin/parcels", label: "Parcels", icon: Package },
-          { href: "/admin/settings", label: "Settings", icon: Settings },
-        ]
+        { href: "/admin/dashboard", label: "Dashboard", icon: BarChart3 },
+        { href: "/admin/users", label: "Users", icon: Users },
+        { href: "/admin/parcels", label: "Parcels", icon: Package },
+        { href: "/admin/reports", label: "Reports", icon: BarChart3 },
+        { href: "/admin/settings", label: "Settings", icon: Settings },
+      ]
       : user?.role === "sender"
-      ? [
+        ? [
           { href: "/sender/dashboard", label: "Overview", icon: BarChart3 },
           { href: "/sender/parcels", label: "My Parcels", icon: Package },
           {
@@ -289,46 +290,49 @@ export default function Navigation() {
             label: "Create Parcel",
             icon: Package,
           },
-          { href: "/track", label: "Track Parcel", icon: Search },
+          { href: "/sender/addresses", label: "Addresses", icon: Home },
           { href: "/sender/statistics", label: "Statistics", icon: BarChart3 },
+          // { href: "/sender/billing", label: "Billing", icon: FileText }, // Optional 6th
         ]
-      : user?.role === "receiver"
-      ? [
-          { href: "/receiver/dashboard", label: "Dashboard", icon: BarChart3 },
-          { href: "/track", label: "Track Parcel", icon: Search },
-          { href: "/profile", label: "Profile", icon: User },
-          { href: "/contact", label: "Contact", icon: MessageSquare },
-        ]
-      : [
-          { href: "#hero", label: "Home", icon: Home },
-          { href: "#services", label: "Our Services", icon: Package },
-          { href: "/track", label: "Track Parcel", icon: Search },
-          { href: "#pricing", label: "Pricing", icon: FileText },
-          { href: "/contact", label: "Contact", icon: MessageSquare },
-        ];
+        : user?.role === "receiver"
+          ? [
+            { href: "/receiver/dashboard", label: "Dashboard", icon: BarChart3 },
+            { href: "/receiver/history", label: "History", icon: Package },
+            { href: "/track", label: "Track", icon: Search },
+            { href: "/receiver/addresses", label: "Addresses", icon: Home },
+            { href: "/receiver/preferences", label: "Preferences", icon: Settings },
+            { href: "/contact", label: "Support", icon: MessageSquare },
+          ]
+          : [
+            { href: "#hero", label: "Home", icon: Home },
+            { href: "#services", label: "Our Services", icon: Package },
+            { href: "/track", label: "Track Parcel", icon: Search },
+            { href: "#pricing", label: "Pricing", icon: FileText },
+            { href: "/contact", label: "Contact", icon: MessageSquare },
+          ];
 
   const userMenuItems: NavigationItem[] =
     user?.role === "admin"
       ? [{ href: "/profile", label: "Profile", icon: User }]
       : user?.role === "sender"
-      ? [
+        ? [
           { href: "/profile", label: "Profile", icon: User },
         ]
-      : user?.role === "receiver"
-      ? [
-          { href: "/profile", label: "Profile", icon: User },
-          { href: "/receiver/track", label: "Track Parcel", icon: Search },
-        ]
-      : [
-          { href: "/profile", label: "Profile", icon: User },
-          { href: "/settings", label: "Settings", icon: Settings },
-        ];
+        : user?.role === "receiver"
+          ? [
+            { href: "/profile", label: "Profile", icon: User },
+            { href: "/receiver/track", label: "Track Parcel", icon: Search },
+          ]
+          : [
+            { href: "/profile", label: "Profile", icon: User },
+            { href: "/settings", label: "Settings", icon: Settings },
+          ];
 
   return (
     <nav className="bg-background/95 backdrop-blur-xl shadow-lg border-b border-border sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
         <div className="flex justify-between h-14 sm:h-16">
-          {}
+          { }
           <div className="flex items-center min-w-0 flex-1">
             <button
               onClick={() => handleNavClick("#hero")}
@@ -351,7 +355,7 @@ export default function Navigation() {
             </button>
           </div>
 
-          {}
+          { }
           <div className="hidden lg:flex items-center space-x-1">
             {navigationItems.map((item) => {
               const Icon = item.icon;
@@ -361,16 +365,14 @@ export default function Navigation() {
                 <button
                   key={item.href}
                   onClick={() => handleNavClick(item.href)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 group relative overflow-hidden ${
-                    active
-                      ? "text-white bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 shadow-lg shadow-red-500/25"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                  }`}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 group relative overflow-hidden ${active
+                    ? "text-white bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 shadow-lg shadow-red-500/25"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    }`}
                 >
                   <Icon
-                    className={`h-4 w-4 transition-transform duration-300 ${
-                      active ? "scale-110" : "group-hover:scale-110"
-                    }`}
+                    className={`h-4 w-4 transition-transform duration-300 ${active ? "scale-110" : "group-hover:scale-110"
+                      }`}
                   />
                   <span>{item.label}</span>
                   {!active && (
@@ -384,16 +386,14 @@ export default function Navigation() {
                 <Link
                   key={item.href}
                   to={item.href}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 group relative overflow-hidden ${
-                    active
-                      ? "text-white bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 shadow-lg shadow-red-500/25"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                  }`}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 group relative overflow-hidden ${active
+                    ? "text-white bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 shadow-lg shadow-red-500/25"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    }`}
                 >
                   <Icon
-                    className={`h-4 w-4 transition-transform duration-300 ${
-                      active ? "scale-110" : "group-hover:scale-110"
-                    }`}
+                    className={`h-4 w-4 transition-transform duration-300 ${active ? "scale-110" : "group-hover:scale-110"
+                      }`}
                   />
                   <span>{item.label}</span>
                   {!active && (
@@ -407,16 +407,16 @@ export default function Navigation() {
             })}
           </div>
 
-          {}
+          { }
           <div className="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0">
-            {}
+            { }
             <div className="hidden xs:block">
               <ThemeToggle />
             </div>
 
             {user ? (
               <>
-                {}
+                { }
                 {user.role === "admin" && (
                   <div className="relative hidden lg:block" ref={notificationsRef}>
                     <button
@@ -433,10 +433,10 @@ export default function Navigation() {
                       )}
                     </button>
 
-                    {}
+                    { }
                     {isNotificationsOpen && (
                       <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-background rounded-lg shadow-xl border border-border z-50 max-h-96 overflow-y-auto">
-                        {}
+                        { }
                         <div className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 p-3 sm:p-4 rounded-t-lg">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -451,16 +451,15 @@ export default function Navigation() {
                           </div>
                         </div>
 
-                        {}
+                        { }
                         <div className="max-h-80 overflow-y-auto">
                           {notificationsList.map((notification) => (
                             <div
                               key={notification.id}
-                              className={`p-2.5 sm:p-3 border-b border-border hover:bg-muted/50 transition-colors cursor-pointer ${
-                                notification.unread
-                                  ? "bg-blue-50/50 dark:bg-blue-900/20"
-                                  : ""
-                              }`}
+                              className={`p-2.5 sm:p-3 border-b border-border hover:bg-muted/50 transition-colors cursor-pointer ${notification.unread
+                                ? "bg-blue-50/50 dark:bg-blue-900/20"
+                                : ""
+                                }`}
                             >
                               <div className="flex items-start gap-2 sm:gap-3">
                                 <div className="mt-0.5 sm:mt-1 flex-shrink-0">
@@ -487,7 +486,7 @@ export default function Navigation() {
                           ))}
                         </div>
 
-                        {}
+                        { }
                         <div className="p-2.5 sm:p-3 border-t border-border bg-muted/30">
                           <button className="w-full text-center text-xs sm:text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 font-medium">
                             View All Notifications
@@ -498,7 +497,7 @@ export default function Navigation() {
                   </div>
                 )}
 
-                {}
+                { }
                 <div className="relative hidden lg:block" ref={userMenuRef}>
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -515,13 +514,12 @@ export default function Navigation() {
                       </div>
                     </div>
                     <ChevronDown
-                      className={`h-3 w-3 sm:h-4 sm:w-4 transition-transform duration-300 ${
-                        isUserMenuOpen ? "rotate-180" : ""
-                      }`}
+                      className={`h-3 w-3 sm:h-4 sm:w-4 transition-transform duration-300 ${isUserMenuOpen ? "rotate-180" : ""
+                        }`}
                     />
                   </button>
 
-                  {}
+                  { }
                   {isUserMenuOpen && (
                     <div className="absolute right-0 mt-3 w-56 sm:w-64 bg-background/95 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-2xl border border-border py-2 z-50 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
                       <div className="px-3 sm:px-4 py-3 sm:py-4 border-b border-border">
@@ -588,7 +586,7 @@ export default function Navigation() {
               </div>
             )}
 
-            {}
+            { }
             <div className="lg:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -604,7 +602,7 @@ export default function Navigation() {
           </div>
         </div>
 
-        {}
+        { }
         {isMobileMenuOpen && (
           <div className="lg:hidden border-t border-border bg-background/95 backdrop-blur-xl animate-in slide-in-from-top-2 duration-200">
             <div className="px-3 sm:px-4 py-3 sm:py-4 space-y-1">
@@ -619,16 +617,14 @@ export default function Navigation() {
                       handleNavClick(item.href);
                       setIsMobileMenuOpen(false);
                     }}
-                    className={`flex items-center space-x-2.5 sm:space-x-3 px-2.5 sm:px-3 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 group w-full text-left relative ${
-                      active
-                        ? "text-white bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 shadow-lg shadow-red-500/25"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                    }`}
+                    className={`flex items-center space-x-2.5 sm:space-x-3 px-2.5 sm:px-3 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 group w-full text-left relative ${active
+                      ? "text-white bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 shadow-lg shadow-red-500/25"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                      }`}
                   >
                     <Icon
-                      className={`h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 flex-shrink-0 ${
-                        active ? "scale-110" : "group-hover:scale-110"
-                      }`}
+                      className={`h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 flex-shrink-0 ${active ? "scale-110" : "group-hover:scale-110"
+                        }`}
                     />
                     <span>{item.label}</span>
                     {active && (
@@ -639,17 +635,15 @@ export default function Navigation() {
                   <Link
                     key={item.href}
                     to={item.href}
-                    className={`flex items-center space-x-2.5 sm:space-x-3 px-2.5 sm:px-3 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 group relative ${
-                      active
-                        ? "text-white bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 shadow-lg shadow-red-500/25"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                    }`}
+                    className={`flex items-center space-x-2.5 sm:space-x-3 px-2.5 sm:px-3 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 group relative ${active
+                      ? "text-white bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 shadow-lg shadow-red-500/25"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                      }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <Icon
-                      className={`h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 flex-shrink-0 ${
-                        active ? "scale-110" : "group-hover:scale-110"
-                      }`}
+                      className={`h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 flex-shrink-0 ${active ? "scale-110" : "group-hover:scale-110"
+                        }`}
                     />
                     <span>{item.label}</span>
                     {active && (
@@ -678,7 +672,7 @@ export default function Navigation() {
                   </div>
 
                   <div className="space-y-1 mt-3 sm:mt-4">
-                    {}
+                    { }
                     <div className="xs:hidden flex items-center space-x-2.5 px-2.5 py-2.5 text-muted-foreground">
                       <Settings className="h-4 w-4 flex-shrink-0" />
                       <span className="text-xs font-medium flex-1">Theme</span>

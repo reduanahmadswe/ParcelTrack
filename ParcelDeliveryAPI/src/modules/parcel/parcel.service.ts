@@ -104,8 +104,8 @@ export class ParcelService {
       const userIdString = userId?.toString();
 
       const hasAccess = parcelSenderId === userIdString ||
-                parcelReceiverId === userIdString ||
-                (userEmail && parcel.receiverInfo.email === userEmail); // For email tracking
+        parcelReceiverId === userIdString ||
+        (userEmail && parcel.receiverInfo.email === userEmail); // For email tracking
 
       if (!hasAccess) {
         throw new AppError('Access denied: You can only view your own parcels', 403);
@@ -144,8 +144,8 @@ export class ParcelService {
       const userIdString = userId?.toString();
 
       const hasAccess = parcelSenderId === userIdString ||
-                parcelReceiverId === userIdString ||
-                (userEmail && parcel.receiverInfo.email === userEmail); // For email tracking
+        parcelReceiverId === userIdString ||
+        (userEmail && parcel.receiverInfo.email === userEmail); // For email tracking
 
       if (!hasAccess) {
         throw new AppError('Access denied: You can only view status logs of your own parcels', 403);
@@ -177,8 +177,11 @@ export class ParcelService {
     if (userRole === 'sender') {
       filter.senderId = userId;
     } else if (userRole === 'receiver') {
-      // For receivers, match against their email in receiverInfo.email
-      filter['receiverInfo.email'] = userEmail;
+      // For receivers, match against their email in receiverInfo.email OR use their ID if available in receiverId field
+      filter.$or = [
+        { 'receiverInfo.email': userEmail },
+        { receiverId: userId }
+      ];
     }
 
     // Additional filters
@@ -336,7 +339,7 @@ export class ParcelService {
       }
       // Senders can only cancel if not dispatched
       if (statusData.status !== 'cancelled' ||
-                ['dispatched', 'in-transit', 'delivered', 'returned'].includes(parcel.currentStatus)) {
+        ['dispatched', 'in-transit', 'delivered', 'returned'].includes(parcel.currentStatus)) {
         throw new AppError('Senders can only cancel parcels that are not yet dispatched', 403);
       }
     } else if (userRole === 'receiver') {
@@ -450,20 +453,22 @@ export class ParcelService {
   }
 
   // Get parcel statistics (admin only)
-  static async getParcelStats(): Promise<{
-        totalParcels: number;
-        requested: number;
-        approved: number;
-        dispatched: number;
-        inTransit: number;
-        delivered: number;
-        cancelled: number;
-        returned: number;
-        urgentParcels: number;
-        blockedParcels: number;
-        totalRevenue: number;
-    }> {
+  static async getParcelStats(timeframe: string = 'all'): Promise<any> {
+    const matchStage: any = {};
+    const now = new Date();
+
+    if (timeframe === 'monthly') {
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      matchStage.createdAt = { $gte: startOfMonth, $lte: endOfMonth };
+    } else if (timeframe === 'daily') {
+      const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(now.setHours(23, 59, 59, 999));
+      matchStage.createdAt = { $gte: startOfDay, $lte: endOfDay };
+    }
+
     const stats = await Parcel.aggregate([
+      { $match: matchStage },
       {
         $group: {
           _id: null,
@@ -498,6 +503,9 @@ export class ParcelService {
           totalRevenue: {
             $sum: { $cond: ['$fee.isPaid', '$fee.totalFee', 0] },
           },
+          potentialRevenue: {
+            $sum: { $cond: [{ $ne: ['$currentStatus', 'cancelled'] }, '$fee.totalFee', 0] },
+          },
         },
       },
     ]);
@@ -514,6 +522,7 @@ export class ParcelService {
       urgentParcels: 0,
       blockedParcels: 0,
       totalRevenue: 0,
+      potentialRevenue: 0,
     };
   }
 

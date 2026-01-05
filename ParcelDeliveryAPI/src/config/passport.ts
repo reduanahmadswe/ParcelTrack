@@ -1,0 +1,61 @@
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { User } from '../modules/user/user.model';
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback';
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: GOOGLE_CALLBACK_URL,
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const email = profile.emails?.[0]?.value;
+        
+        if (!email) {
+          return done(new Error('No email found in Google profile'), false);
+        }
+
+        // Check if user already exists
+        let user = await User.findOne({ email });
+
+        if (!user) {
+          // Create new user from Google profile
+          user = new User({
+            name: profile.displayName || 'Google User',
+            email: email,
+            password: Math.random().toString(36).slice(-8) + 'Aa1!', // Random password
+            role: 'sender', // Default role
+            phone: '',
+            address: {
+              street: '',
+              city: '',
+              state: '',
+              zipCode: '',
+              country: '',
+            },
+            googleId: profile.id,
+            isEmailVerified: true, // Google emails are verified
+          });
+          await user.save();
+        } else if (!user.googleId) {
+          // Link Google account to existing user
+          user.googleId = profile.id;
+          user.isEmailVerified = true;
+          await user.save();
+        }
+
+        return done(null, user);
+      } catch (error) {
+        return done(error as Error, false);
+      }
+    }
+  )
+);
+
+export default passport;

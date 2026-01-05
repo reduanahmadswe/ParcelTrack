@@ -2,18 +2,23 @@ import { TokenManager } from '../../services/TokenManager';
 import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { logout, refreshTokenSuccess, setLoading } from '../slices/authSlice';
 
-const API_BASE_URL = 'https://parcel-delivery-api.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 const baseQuery = fetchBaseQuery({
     baseUrl: API_BASE_URL,
     prepareHeaders: (headers, { endpoint }) => {
-        
         const token = TokenManager.getAccessToken();
-        
+
+        console.log('🔑 [apiSlice] prepareHeaders called for endpoint:', endpoint);
+        console.log('🔑 [apiSlice] Token from TokenManager:', token ? `${token.substring(0, 20)}...` : 'NULL');
+
         if (token) {
             headers.set('Authorization', `Bearer ${token}`);
+            console.log('✅ [apiSlice] Authorization header set');
+        } else {
+            console.warn('⚠️ [apiSlice] No token found! Headers will not include Authorization');
         }
-        
+
         headers.set('Content-Type', 'application/json');
         return headers;
     },
@@ -24,18 +29,18 @@ const baseQueryWithReauth: BaseQueryFn<
     unknown,
     FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-    
+
     api.dispatch(setLoading(true));
-    
+
     let result = await baseQuery(args, api, extraOptions);
 
     if (result.error && result.error.status === 401) {
         const refreshToken = TokenManager.getRefreshToken();
-        
+
         if (!refreshToken) {
             api.dispatch(logout());
             api.dispatch(setLoading(false));
-            
+
             if (typeof window !== 'undefined') {
                 window.location.href = '/login';
             }
@@ -43,7 +48,7 @@ const baseQueryWithReauth: BaseQueryFn<
         }
 
         try {
-            
+
             const refreshResult = await baseQuery(
                 {
                     url: '/auth/refresh-token',
@@ -61,17 +66,17 @@ const baseQueryWithReauth: BaseQueryFn<
                 let newRefreshToken: string | null = null;
 
                 if (responseData.success && responseData.data) {
-                    
+
                     newAccessToken = responseData.data.accessToken;
                     newRefreshToken = responseData.data.refreshToken;
                 } else if (responseData.accessToken) {
-                    
+
                     newAccessToken = responseData.accessToken;
                     newRefreshToken = responseData.refreshToken;
                 }
 
                 if (newAccessToken) {
-                    
+
                     TokenManager.setTokens(newAccessToken, newRefreshToken || refreshToken);
 
                     api.dispatch(refreshTokenSuccess(newAccessToken));
@@ -84,7 +89,7 @@ const baseQueryWithReauth: BaseQueryFn<
                 throw new Error('Refresh token request failed');
             }
         } catch (refreshError) {
-            
+
             api.dispatch(logout());
 
             if (typeof window !== 'undefined') {
@@ -102,11 +107,11 @@ export const apiSlice = createApi({
     reducerPath: 'api',
     baseQuery: baseQueryWithReauth,
     tagTypes: [
-        'Auth', 
-        'User', 
-        'Parcel', 
-        'Admin', 
-        'Dashboard', 
+        'Auth',
+        'User',
+        'Parcel',
+        'Admin',
+        'Dashboard',
         'Stats',
         'SenderParcel',
         'SenderDashboard',
@@ -115,11 +120,11 @@ export const apiSlice = createApi({
         'ReceiverDashboard',
         'ReceiverStats',
     ],
-    
-    keepUnusedDataFor: Infinity, 
-    refetchOnMountOrArgChange: false, 
-    refetchOnReconnect: true, 
-    refetchOnFocus: false, 
+
+    keepUnusedDataFor: Infinity,
+    refetchOnMountOrArgChange: false,
+    refetchOnReconnect: true,
+    refetchOnFocus: false,
     endpoints: () => ({}),
 });
 

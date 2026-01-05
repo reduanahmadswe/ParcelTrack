@@ -11,7 +11,6 @@ import {
   getDivisionsByCity,
   getPostalCodesByDivision,
 } from "../../constants/bangladeshData";
-import FooterSection from "../public/sections/FooterSection";
 import { invalidateAllSenderCaches } from "../../utils/realtimeSync";
 
 export default function CreateParcelPage() {
@@ -1271,7 +1270,6 @@ export default function CreateParcelPage() {
           )}
         </div>
       </div>
-      <FooterSection />
     </ProtectedRoute>
   );
 }

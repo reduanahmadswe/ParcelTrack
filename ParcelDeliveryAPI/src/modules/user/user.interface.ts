@@ -14,6 +14,22 @@ export interface IUser extends Document {
         zipCode: string;
         country: string;
     };
+    addressBook?: Array<{
+        label: string;
+        street: string;
+        city: string;
+        state: string;
+        zipCode: string;
+        country: string;
+        isDefault?: boolean;
+    }>;
+    preferences?: {
+        deliveryTime: 'any' | 'morning' | 'afternoon' | 'evening';
+        notifications: boolean;
+        newsletter: boolean;
+    };
+    googleId?: string;
+    isEmailVerified?: boolean;
     isBlocked: boolean;
     isVerified: boolean;
     createdAt: Date;
@@ -53,6 +69,8 @@ export interface ICreateUser {
         zipCode: string;
         country: string;
     };
+    googleId?: string;
+    isEmailVerified?: boolean;
 }
 
 export interface IUpdateUser {
@@ -65,6 +83,22 @@ export interface IUpdateUser {
         zipCode?: string;
         country?: string;
     };
+    addressBook?: Array<{
+        label: string;
+        street: string;
+        city: string;
+        state: string;
+        zipCode: string;
+        country: string;
+        isDefault?: boolean;
+    }>;
+    preferences?: {
+        deliveryTime?: 'any' | 'morning' | 'afternoon' | 'evening';
+        notifications?: boolean;
+        newsletter?: boolean;
+    };
+    googleId?: string;
+    isEmailVerified?: boolean;
 }
 
 export interface ILoginUser {

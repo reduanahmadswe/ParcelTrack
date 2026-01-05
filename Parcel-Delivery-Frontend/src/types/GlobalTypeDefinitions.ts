@@ -9,6 +9,19 @@ export interface User {
   isVerified: boolean;
   createdAt: string;
   updatedAt: string;
+  addressBook?: AddressBookEntry[];
+  preferences?: UserPreferences;
+}
+
+export interface AddressBookEntry extends Address {
+  label: string;
+  isDefault?: boolean;
+}
+
+export interface UserPreferences {
+  deliveryTime: 'any' | 'morning' | 'afternoon' | 'evening';
+  notifications: boolean;
+  newsletter: boolean;
 }
 
 export interface Address {
@@ -98,13 +111,13 @@ export interface ApiResponse<T> {
 }
 
 export interface AuthResponse {
-    success: boolean
-    data: {
-        user: User
-        token: string
-        refreshToken?: string
-    }
-    message: string
+  success: boolean
+  data: {
+    user: User
+    token: string
+    refreshToken?: string
+  }
+  message: string
 }
 
 export interface UserStats {
@@ -147,8 +160,8 @@ export interface AdminDashboardStats {
     total: number;
   };
   parcelStatusCounts: {
-    pending: number;      
-    inTransit: number;    
+    pending: number;
+    inTransit: number;
     delivered: number;
     cancelled: number;
     returned: number;

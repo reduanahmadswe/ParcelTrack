@@ -40,6 +40,16 @@ export function useParcels(filterParams: FilterParams) {
         try {
             fetchingRef.current = true;
 
+            // Check if token exists before making API call
+            const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+            if (!token) {
+                console.error('❌ [ParcelManagement] No token available, skipping fetch');
+                setParcels([]);
+                setLoading(false);
+                fetchingRef.current = false;
+                return;
+            }
+
             if (!force) {
                 const cachedParcels = adminCache.get<Parcel[]>(CACHE_KEYS.PARCELS);
                 if (cachedParcels) {
@@ -54,6 +64,7 @@ export function useParcels(filterParams: FilterParams) {
                 setLoading(true);
             }
 
+            console.log('🔍 [ParcelManagement] Token available:', token.substring(0, 20) + '...');
             const apiParcels = await ParcelApiService.fetchParcels(filterParams);
 
             const validParcels = ParcelDataTransformer.transformApiParcelsToFrontend(apiParcels);
@@ -77,7 +88,13 @@ export function useParcels(filterParams: FilterParams) {
     useEffect(() => {
         if (!isMountedRef.current) {
             isMountedRef.current = true;
-            fetchParcels(false); 
+            
+            // Wait a bit for auth/tokens to be ready before fetching
+            const timer = setTimeout(() => {
+                fetchParcels(false);
+            }, 500); // 500ms delay to ensure tokens are set
+            
+            return () => clearTimeout(timer);
         }
     }, [fetchParcels]);
 

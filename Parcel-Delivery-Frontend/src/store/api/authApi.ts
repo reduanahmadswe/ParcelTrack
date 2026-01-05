@@ -3,7 +3,7 @@ import { apiSlice } from './apiSlice';
 
 export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        
+
         login: builder.mutation<
             {
                 success: boolean;
@@ -50,7 +50,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
             { success: boolean; data: User },
             void
         >({
-            query: () => '/auth/me',
+            query: () => '/users/profile',
             providesTags: ['User'],
         }),
 
@@ -71,6 +71,17 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 method: 'POST',
             }),
         }),
+        updateProfile: builder.mutation<
+            { success: boolean; data: User },
+            Partial<User>
+        >({
+            query: (data) => ({
+                url: '/users/profile',
+                method: 'PATCH',
+                body: data,
+            }),
+            invalidatesTags: ['User'],
+        }),
     }),
 });
 
@@ -80,5 +91,6 @@ export const {
     useGetCurrentUserQuery,
     useRefreshTokenMutation,
     useLogoutMutation,
+    useUpdateProfileMutation,
 } = authApiSlice;
 

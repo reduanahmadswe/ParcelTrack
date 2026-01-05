@@ -69,11 +69,39 @@ const userSchema = new Schema<IUser>({
     type: addressSchema,
     required: [true, 'Address is required'],
   },
+  addressBook: [{
+    label: { type: String, default: 'Home' },
+    street: String,
+    city: String,
+    state: String,
+    zipCode: String,
+    country: { type: String, default: 'Bangladesh' },
+    isDefault: { type: Boolean, default: false },
+  }],
+  preferences: {
+    deliveryTime: {
+      type: String,
+      enum: ['any', 'morning', 'afternoon', 'evening'],
+      default: 'any'
+    },
+    notifications: { type: Boolean, default: true },
+    newsletter: { type: Boolean, default: false },
+  },
+
   isBlocked: {
     type: Boolean,
     default: false,
   },
   isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true, // Allow null values but enforce uniqueness for non-null
+  },
+  isEmailVerified: {
     type: Boolean,
     default: false,
   },

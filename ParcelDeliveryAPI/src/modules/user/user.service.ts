@@ -36,11 +36,19 @@ export class UserService {
     return User.findOne({ email }).select('+password');
   }
 
+  // Find user by email (without password, for Google OAuth)
+  static async findUserByEmail(email: string): Promise<IUser | null> {
+    return User.findOne({ email });
+  }
+
   // Update user
   static async updateUser(id: string, updateData: IUpdateUser): Promise<IUserResponse | null> {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new AppError('Invalid user ID format', 400);
     }
+
+    console.log('Updating user:', id);
+    console.log('Update payload:', JSON.stringify(updateData, null, 2));
 
     const user = await User.findByIdAndUpdate(
       id,
@@ -130,13 +138,13 @@ export class UserService {
 
   // Get user statistics (admin only)
   static async getUserStats(): Promise<{
-        totalUsers: number;
-        senders: number;
-        receivers: number;
-        admins: number;
-        blockedUsers: number;
-        verifiedUsers: number;
-    }> {
+    totalUsers: number;
+    senders: number;
+    receivers: number;
+    admins: number;
+    blockedUsers: number;
+    verifiedUsers: number;
+  }> {
     const stats = await User.aggregate([
       {
         $group: {

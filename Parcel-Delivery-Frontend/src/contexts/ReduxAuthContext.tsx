@@ -213,13 +213,35 @@ export function ReduxAuthProvider({ children }: { children: ReactNode }) {
       dispatch(setLoading(true));
 
       const result = await loginMutation({ email, password }).unwrap();
+      
+      console.log('🔐 [Login] Backend response:', result);
 
       if (result && result.success && result.data) {
         const { user: userData, accessToken, refreshToken } = result.data;
 
-        // Set tokens first
-        TokenManager.setTokens(accessToken, refreshToken);
+        // Save user to localStorage FIRST
         localStorage.setItem("userData", JSON.stringify(userData));
+        console.log('💾 [Login] User saved to localStorage');
+
+        // Set tokens via TokenManager
+        TokenManager.setTokens(accessToken, refreshToken);
+        console.log('🔑 [Login] Tokens saved via TokenManager');
+
+        // Verify tokens were actually saved
+        const verifyToken = TokenManager.getAccessToken();
+        console.log('🔍 [Login] Token verification:', verifyToken ? `SUCCESS (${verifyToken.substring(0, 20)}...)` : 'FAILED');
+        
+        if (!verifyToken) {
+          console.error('❌ [Login] Token save verification FAILED! Force saving...');
+          // Force save to localStorage as absolute fallback
+          localStorage.setItem('accessToken', accessToken);
+          if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+          console.log('💾 [Login] Tokens FORCE-saved to localStorage');
+          
+          // Double verify
+          const doubleCheck = localStorage.getItem('accessToken');
+          console.log('🔍 [Login] Double-check:', doubleCheck ? 'Token EXISTS in localStorage' : 'STILL MISSING!');
+        }
 
         // Dispatch to Redux with flushSync for immediate state update
         try {

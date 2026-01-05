@@ -6,13 +6,14 @@ import App from "./App";
 import { getCacheStats, checkCacheHealth, clearAllCache, setStoreDispatch } from "./utils/adminCache";
 import { store } from "./store/store";
 import debugPersist from "./utils/debugPersist";
+import { fixTokenStorage } from "./utils/fixTokenStorage";
 
 setStoreDispatch(store.dispatch);
 
 const params = new URLSearchParams(window.location.search);
 const redirect = params.get('redirect');
 if (redirect) {
-  
+
   window.history.replaceState(null, '', redirect);
 }
 
@@ -22,6 +23,7 @@ const cacheStats = getCacheStats();
 (window as any).__checkCacheHealth = checkCacheHealth;
 (window as any).__clearCache = clearAllCache;
 (window as any).__debugPersist = debugPersist;
+(window as any).__fixTokenStorage = fixTokenStorage;
 
 if (process.env.NODE_ENV === 'development') {
   setTimeout(() => {

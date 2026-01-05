@@ -202,7 +202,8 @@ export class ParcelController {
 
   // Get parcel statistics (admin only)
   static getParcelStats = catchAsync(async (req: Request, res: Response) => {
-    const stats = await ParcelService.getParcelStats();
+    const { timeframe } = req.query; // 'monthly' | 'daily'
+    const stats = await ParcelService.getParcelStats(timeframe as string);
 
     res.status(200).json({
       success: true,
