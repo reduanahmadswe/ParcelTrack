@@ -19,10 +19,19 @@ router.post('/refresh-token', AuthController.refreshToken);
 console.log('🔧 Registering Google OAuth routes...');
 router.get('/google', (req, res, next) => {
   console.log('📍 Hit /google route');
+  console.log('🔑 Starting Google OAuth flow...');
   passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
 });
-router.get('/google/callback', 
-  passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+
+router.get('/google/callback', (req, res, next) => {
+  console.log('📍 Hit /google/callback route');
+  console.log('🔄 Processing Google OAuth callback...');
+  next();
+}, 
+  passport.authenticate('google', { 
+    session: false, 
+    failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=google_auth_failed`
+  }),
   AuthController.googleCallback
 );
 

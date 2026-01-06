@@ -7,12 +7,16 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback';
 
 console.log('🔧 Configuring Google OAuth Strategy...');
-console.log(`   Client ID: ${GOOGLE_CLIENT_ID ? '✅ Set' : '❌ Missing'}`);
+console.log(`   Client ID: ${GOOGLE_CLIENT_ID ? '✅ Set (' + GOOGLE_CLIENT_ID.substring(0, 20) + '...)' : '❌ Missing'}`);
 console.log(`   Client Secret: ${GOOGLE_CLIENT_SECRET ? '✅ Set' : '❌ Missing'}`);
 console.log(`   Callback URL: ${GOOGLE_CALLBACK_URL}`);
 
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
-  console.warn('⚠️  WARNING: Google OAuth credentials not configured! Google login will not work.');
+  console.error('❌ ERROR: Google OAuth credentials not configured!');
+  console.error('   Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in environment variables');
+  console.error('   Google login will NOT work until these are set!');
+} else {
+  console.log('✅ Google OAuth credentials configured successfully');
 }
 
 passport.use(

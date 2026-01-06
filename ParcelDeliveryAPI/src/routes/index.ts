@@ -49,11 +49,12 @@ const moduleRoutes = [
 ];
 
 // Register all module routes
+console.log('\n📋 Registering module routes:');
 moduleRoutes.forEach((moduleRoute) => {
-  console.log(`🔗 Registering route: ${moduleRoute.path}`);
+  console.log(`   🔗 ${moduleRoute.path}`);
   router.use(moduleRoute.path, moduleRoute.route);
 });
 
-console.log('✅ All module routes registered');
+console.log('✅ All module routes registered\n');
 
 export { router };
