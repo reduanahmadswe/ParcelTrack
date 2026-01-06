@@ -26,8 +26,8 @@ export default function ReceiverDashboard() {
         refetchOnReconnect: true,
     });
 
-    // Extract parcels array from response
-    const parcels: Parcel[] = Array.isArray(parcelsData?.data) ? parcelsData.data : [];
+    // parcelsData is already a Parcel[] array, no need to access .data
+    const parcels: Parcel[] = Array.isArray(parcelsData) ? parcelsData : [];
 
     const handleViewParcel = (parcel: Parcel) => {
         setSelectedParcel(parcel);
