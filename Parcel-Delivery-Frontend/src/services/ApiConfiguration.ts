@@ -16,7 +16,7 @@ api.interceptors.request.use(
     const token = TokenManager.getAccessToken();
     const fromLocalStorage = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
     
-    console.log('🔍 [API Request] URL:', config.baseURL + config.url);
+    console.log('🔍 [API Request] URL:', (config.baseURL || '') + (config.url || ''));
     console.log('🔑 [API Request] Token from TokenManager:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
     console.log('🔑 [API Request] Token from localStorage:', fromLocalStorage ? `${fromLocalStorage.substring(0, 20)}...` : 'NO TOKEN');
     

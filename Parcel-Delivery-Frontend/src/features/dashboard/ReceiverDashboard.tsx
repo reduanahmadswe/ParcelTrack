@@ -27,7 +27,7 @@ export default function ReceiverDashboard() {
     });
 
     // Extract parcels array from response
-    const parcels = Array.isArray(parcelsData?.data) ? parcelsData.data : [];
+    const parcels: Parcel[] = Array.isArray(parcelsData?.data) ? parcelsData.data : [];
 
     const handleViewParcel = (parcel: Parcel) => {
         setSelectedParcel(parcel);
@@ -41,13 +41,13 @@ export default function ReceiverDashboard() {
 
     const stats = {
         total: parcels.length,
-        pending: parcels.filter((p) =>
+        pending: parcels.filter((p: Parcel) =>
             ["requested", "approved"].includes(p.currentStatus)
         ).length,
-        inTransit: parcels.filter((p) =>
+        inTransit: parcels.filter((p: Parcel) =>
             ["dispatched", "in-transit"].includes(p.currentStatus)
         ).length,
-        delivered: parcels.filter((p) => p.currentStatus === "delivered").length,
+        delivered: parcels.filter((p: Parcel) => p.currentStatus === "delivered").length,
     };
 
     const recentParcels = parcels.slice(0, 5);
@@ -186,7 +186,7 @@ export default function ReceiverDashboard() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border">
-                                        {recentParcels.map((parcel) => (
+                                        {recentParcels.map((parcel: Parcel) => (
                                             <tr
                                                 key={parcel._id}
                                                 className="hover:bg-muted/30 transition-colors"
