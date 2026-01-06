@@ -400,7 +400,7 @@ Before you begin, ensure you have the following installed:
 
    ```env
    # API Configuration
-   VITE_API_URL=https://parcel-delivery-api.onrender.com/api
+   VITE_API_URL=https://parceltrackapi.onrender.com/api
    # For local development, use:
    # VITE_API_URL=http://localhost:5000/api
 
@@ -437,7 +437,7 @@ Create a `.env` file in the root directory with the following variables:
 
 ```env
 # API Configuration
-VITE_API_URL=https://parcel-delivery-api.onrender.com/api
+VITE_API_URL=https://parceltrackapi.onrender.com/api
 
 # For local development:
 # VITE_API_URL=http://localhost:5000/api
@@ -451,7 +451,7 @@ VITE_APP_VERSION=1.0.0
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `VITE_API_URL` | Backend API base URL | `https://parcel-delivery-api.onrender.com/api` |
+| `VITE_API_URL` | Backend API base URL | `https://parceltrackapi.onrender.com/api` |
 | `VITE_APP_NAME` | Application name | `Parcel Delivery System` |
 | `VITE_APP_VERSION` | Application version | `1.0.0` |
 

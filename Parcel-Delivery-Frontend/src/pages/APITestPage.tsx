@@ -10,7 +10,7 @@ export default function APITestPage() {
     
     try {
 
-      const response = await fetch('https://parcel-delivery-api.onrender.com/api/auth/login', {
+      const response = await fetch('https://parceltrackapi.onrender.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ export default function APITestPage() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="font-semibold text-blue-800 mb-2">Test Information:</h3>
           <ul className="text-blue-700 text-sm space-y-1">
-            <li>• Testing login endpoint: <code>https://parcel-delivery-api.onrender.com/api/auth/login</code></li>
+            <li>• Testing login endpoint: <code>https://parceltrackapi.onrender.com/api/auth/login</code></li>
             <li>• Using admin credentials: admin@parceldelivery.com / Admin123!</li>
             <li>• This will show if backend is responding and generating tokens</li>
             <li>• Check browser Network tab for detailed request/response info</li>

@@ -1,6 +1,6 @@
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const API_BASE_URL = 'https://parcel-delivery-api.onrender.com/api';
+const API_BASE_URL = 'https://parceltrackapi.onrender.com/api';
 
 const baseQuery = fetchBaseQuery({
     baseUrl: API_BASE_URL,

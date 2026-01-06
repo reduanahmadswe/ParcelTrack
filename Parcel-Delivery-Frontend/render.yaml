@@ -12,7 +12,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: https://parcel-delivery-api.onrender.com/api
+        value: https://parceltrackapi.onrender.com/api
     headers:
       - path: /*
         name: Cache-Control

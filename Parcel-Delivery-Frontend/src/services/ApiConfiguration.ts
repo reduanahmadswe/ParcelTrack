@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { TokenManager } from './TokenManager';
 
-const API_BASE_URL = 'https://parcel-delivery-api.onrender.com/api';
+const API_BASE_URL = 'https://parceltrackapi.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
